@@ -244,6 +244,58 @@
       border-radius: 4px;
       z-index: 10;
     }
+
+    .scenario-toolbar {
+      background: #eef2f6;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.8125rem;
+    }
+    .scenario-toolbar p {
+      margin: 0 0 0.5rem 0;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .scenario-toolbar .scenario-group {
+      margin-bottom: 0.5rem;
+    }
+    .scenario-toolbar .scenario-group:last-child { margin-bottom: 0; }
+    .scenario-toolbar .scenario-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    .scenario-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .scenario-btns button {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.8125rem;
+      font-family: inherit;
+      font-weight: 500;
+      color: var(--primary);
+      background: #fff;
+      border: 1px solid var(--primary);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .scenario-btns button:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+    .scenario-btns button.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    .field-dni.hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -254,6 +306,31 @@
       <h1>Create account</h1>
       <p>Save addresses, track orders and checkout faster. Already have an account? <a href="/customer/account/login/">Sign in</a></p>
     </header>
+
+    <div class="scenario-toolbar" aria-label="Test scenarios">
+      <p>Test scenario (country + customer type)</p>
+      <div class="scenario-group">
+        <label>Nacional (Spain)</label>
+        <div class="scenario-btns">
+          <button type="button" data-country="ES" data-type="Individual">Individual</button>
+          <button type="button" data-country="ES" data-type="Professional">Professional</button>
+        </div>
+      </div>
+      <div class="scenario-group">
+        <label>UE (Netherlands)</label>
+        <div class="scenario-btns">
+          <button type="button" data-country="NL" data-type="Individual">Individual (no Tax ID)</button>
+          <button type="button" data-country="NL" data-type="Professional">Professional</button>
+        </div>
+      </div>
+      <div class="scenario-group">
+        <label>Export (Switzerland)</label>
+        <div class="scenario-btns">
+          <button type="button" data-country="CH" data-type="Individual">Individual</button>
+          <button type="button" data-country="CH" data-type="Professional">Professional</button>
+        </div>
+      </div>
+    </div>
 
     <form class="form-card" id="signup-form" novalidate>
       <!-- 1. Personal information -->
@@ -293,9 +370,9 @@
           <label for="country">Country <span class="req" aria-hidden="true">*</span></label>
           <select id="country" name="country" autocomplete="country" aria-describedby="country-msg">
             <option value="">Select country</option>
-            <option value="NL">Netherlands</option>
             <option value="ES">Spain</option>
-            <option value="BE">Belgium</option>
+            <option value="NL">Netherlands</option>
+            <option value="CH">Switzerland</option>
           </select>
           <span class="field-msg" id="country-msg" role="status"></span>
         </div>
@@ -337,7 +414,7 @@
           <span class="field-msg" id="phone-msg" role="status"></span>
         </div>
 
-        <div class="field" id="field-dni">
+        <div class="field field-dni" id="field-dni">
           <label for="dni"><span id="dni-label-text">Tax ID or national ID number</span></label>
           <input type="text" id="dni" name="dni" placeholder="e.g. 12345678A" aria-describedby="dni-msg dni-helper" autocomplete="off">
           <p class="id-helper" id="dni-helper" role="status"></p>
@@ -403,25 +480,57 @@
   </div>
 
   <script>
-    // Legal rule: ID not required for individuals shipping outside Spain. Export = any shipment outside Spain (no separate type).
+    // Three scenarios: Nacional (ES), UE (NL), Export (CH). See README.
+    function getCountry() { return document.getElementById('country').value; }
+    function getCustomerType() { return document.getElementById('customertype').value; }
+
+    function isIDVisible() {
+      var country = getCountry();
+      var type = getCustomerType();
+      return !(country === 'NL' && type === 'Individual');
+    }
+
     function isIDRequired() {
-      var country = document.getElementById('country').value;
-      var type = document.getElementById('customertype').value;
-      return country === 'ES' || type === 'Professional';
+      var country = getCountry();
+      var type = getCustomerType();
+      if (country === 'ES') return true;   // Nacional: always required
+      if (country === 'CH') return true;   // Export: always required (customs)
+      if (country === 'NL') return type === 'Professional'; // UE: required only for Professional; Individual = field hidden
+      return false;
     }
 
     function updateIDUI() {
-      var required = isIDRequired();
+      var fieldEl = document.getElementById('field-dni');
       var labelEl = document.getElementById('dni-label-text');
       var inputEl = document.getElementById('dni');
       var helperEl = document.getElementById('dni-helper');
-      if (!labelEl || !inputEl || !helperEl) return;
+      if (!fieldEl || !labelEl || !inputEl || !helperEl) return;
 
+      var visible = isIDVisible();
+      var required = isIDRequired();
+
+      if (!visible) {
+        fieldEl.classList.add('hidden');
+        inputEl.removeAttribute('required');
+        inputEl.value = '';
+        var msg = document.getElementById('dni-msg');
+        fieldEl.classList.remove('is-valid', 'is-invalid');
+        msg.textContent = '';
+        msg.className = 'field-msg';
+        inputEl.setAttribute('aria-invalid', 'false');
+        return;
+      }
+
+      fieldEl.classList.remove('hidden');
       labelEl.innerHTML = 'Tax ID or national ID number' + (required ? ' <span class="req" aria-hidden="true">*</span>' : '');
       inputEl.removeAttribute('required');
       if (required) inputEl.setAttribute('required', 'required');
 
-      if (required) {
+      var country = getCountry();
+      if (country === 'CH') {
+        helperEl.textContent = 'Required for customs clearance so your order can be processed without delays.';
+        helperEl.className = 'id-helper';
+      } else if (required) {
         helperEl.textContent = 'We need this to issue your invoices and process your orders without delays. Thank you for helping us get it right.';
         helperEl.className = 'id-helper';
       } else {
@@ -430,9 +539,8 @@
       }
 
       if (!required) {
-        var field = document.getElementById('field-dni');
         var msg = document.getElementById('dni-msg');
-        field.classList.remove('is-valid', 'is-invalid');
+        fieldEl.classList.remove('is-valid', 'is-invalid');
         msg.textContent = '';
         msg.className = 'field-msg';
         inputEl.setAttribute('aria-invalid', 'false');
@@ -442,10 +550,37 @@
     document.getElementById('country').addEventListener('change', function() {
       updateIDUI();
       validateField('dni');
+      updateScenarioButtons();
     });
     document.getElementById('customertype').addEventListener('change', function() {
       updateIDUI();
       validateField('dni');
+      updateScenarioButtons();
+    });
+
+    function applyScenario(country, type) {
+      document.getElementById('country').value = country || '';
+      document.getElementById('customertype').value = type || '';
+      updateIDUI();
+      validateField('dni');
+      validateField('country');
+      validateField('customertype');
+      updateScenarioButtons();
+    }
+
+    function updateScenarioButtons() {
+      var country = getCountry();
+      var type = getCustomerType();
+      document.querySelectorAll('.scenario-btns button[data-country]').forEach(function(btn) {
+        var active = btn.getAttribute('data-country') === country && btn.getAttribute('data-type') === type;
+        btn.classList.toggle('active', active);
+      });
+    }
+
+    document.querySelectorAll('.scenario-btns button[data-country]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        applyScenario(btn.getAttribute('data-country'), btn.getAttribute('data-type'));
+      });
     });
 
     function setupEye(btnId, inputId) {
@@ -520,9 +655,9 @@
     function validateField(name) {
       var f = fields[name];
       if (!f || !f.el) return;
-      if (name === 'dni' && !isIDRequired()) {
-        setState(name, null);
-        return;
+      if (name === 'dni') {
+        if (!isIDVisible()) { setState(name, null); return; }
+        if (!isIDRequired()) { setState(name, null); return; }
       }
       var v = (name === 'terms' || name === 'privacy') ? '' : f.el.value;
       if (f.validate(v)) setState(name, 'valid');
@@ -555,6 +690,7 @@
     });
 
     updateIDUI();
+    updateScenarioButtons();
   </script>
 </body>
 </html>
