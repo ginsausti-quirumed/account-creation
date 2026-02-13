@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create account – Quirumed (Baymard UX)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f5f5f5;
+      --surface: #fff;
+      --text: #1a1a1a;
+      --muted: #5c5c5c;
+      --primary: #0066a1;
+      --primary-hover: #005080;
+      --success: #059669;
+      --error: #dc2626;
+      --warn: #d97706;
+      --border: #e0e0e0;
+      --focus-ring: 0 0 0 3px rgba(0, 102, 161, 0.25);
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      margin: 0;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .wrap {
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      margin-bottom: 1.5rem;
+    }
+    .page-header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 0.25rem 0;
+    }
+    .page-header p {
+      margin: 0;
+      font-size: 0.9375rem;
+      color: var(--muted);
+    }
+    .page-header a {
+      color: var(--primary);
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .page-header a:hover { text-decoration: underline; }
+
+    .form-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      padding: 1.5rem 1.75rem;
+    }
+
+    .form-section {
+      margin-bottom: 1.75rem;
+    }
+    .form-section:last-of-type { margin-bottom: 0; }
+    .form-section-title {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 1rem;
+    }
+
+    .field {
+      margin-bottom: 1.25rem;
+    }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      margin-bottom: 0.375rem;
+      color: var(--text);
+    }
+    label .req { color: var(--error); }
+    label .opt { font-weight: 400; color: var(--muted); }
+
+    .field-hint {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      margin-top: 0.375rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    select {
+      width: 100%;
+      padding: 0.75rem 0.875rem;
+      font-size: 1rem;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input::placeholder { color: #9ca3af; }
+    input:hover, select:hover { border-color: #b0b0b0; }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: var(--focus-ring);
+    }
+
+    .field.is-valid input,
+    .field.is-valid select { border-color: var(--success); }
+    .field.is-invalid input,
+    .field.is-invalid select { border-color: var(--error); }
+    .field.is-invalid input:focus { box-shadow: 0 0 0 3px rgba(220,38,38,0.2); }
+
+    .field-msg {
+      font-size: 0.8125rem;
+      margin-top: 0.375rem;
+    }
+    .field-msg.error { color: var(--error); }
+    .field-msg.success { color: var(--success); }
+
+    .id-helper {
+      font-size: 0.8125rem;
+      margin-top: 0.375rem;
+      padding: 0.5rem 0.65rem;
+      border-radius: 6px;
+      background: #f0f9ff;
+      color: var(--primary);
+      border: 1px solid rgba(0, 102, 161, 0.2);
+    }
+    .id-helper.optional {
+      background: #f0fdf4;
+      color: var(--success);
+      border-color: rgba(5, 150, 105, 0.2);
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap input { padding-right: 2.75rem; }
+    .eye-btn {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      padding: 0.25rem;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1.1rem;
+    }
+    .eye-btn:hover { color: var(--text); }
+
+    .password-strength {
+      font-size: 0.8125rem;
+      margin-top: 0.375rem;
+      color: var(--muted);
+    }
+    .password-strength.weak { color: var(--error); }
+    .password-strength.fair { color: var(--warn); }
+    .password-strength.good,
+    .password-strength.strong { color: var(--success); }
+    .password-bars {
+      display: flex;
+      gap: 3px;
+      margin-top: 0.35rem;
+    }
+    .password-bars span {
+      height: 3px;
+      flex: 1;
+      max-width: 48px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+    .password-bars span.filled.weak { background: var(--error); }
+    .password-bars span.filled.fair { background: var(--warn); }
+    .password-bars span.filled.good,
+    .password-bars span.filled.strong { background: var(--success); }
+
+    .checkbox-field {
+      margin-top: 1rem;
+    }
+    .checkbox-field label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-weight: 400;
+      cursor: pointer;
+      line-height: 1.4;
+    }
+    .checkbox-field input[type="checkbox"] { margin-top: 0.2rem; flex-shrink: 0; }
+    .checkbox-field a { color: var(--primary); white-space: nowrap; }
+    /* No standalone success checkmark for agreement checkboxes; only show errors */
+    .checkbox-field .field-msg.success { display: none; }
+    .checkbox-field + .checkbox-field { margin-top: 0.75rem; }
+
+    .form-actions {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 0.875rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: #fff;
+      background: var(--primary);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-submit:hover { background: var(--primary-hover); }
+    .btn-submit:focus { outline: none; box-shadow: var(--focus-ring); }
+
+    .badge {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <span class="badge" aria-hidden="true">Baymard UX</span>
+
+  <div class="wrap">
+    <header class="page-header">
+      <h1>Create account</h1>
+      <p>Save addresses, track orders and checkout faster. Already have an account? <a href="/customer/account/login/">Sign in</a></p>
+    </header>
+
+    <form class="form-card" id="signup-form" novalidate>
+      <!-- 1. Personal information -->
+      <div class="form-section">
+        <h2 class="form-section-title">Personal information</h2>
+        <div class="field" id="field-firstname">
+          <label for="firstname">First name <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="firstname" name="firstname" autocomplete="given-name" placeholder="e.g. Jane" aria-describedby="firstname-msg">
+          <span class="field-msg" id="firstname-msg" role="status"></span>
+        </div>
+        <div class="field" id="field-lastname">
+          <label for="lastname">Last name <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="lastname" name="lastname" autocomplete="family-name" placeholder="e.g. Smith" aria-describedby="lastname-msg">
+          <span class="field-msg" id="lastname-msg" role="status"></span>
+        </div>
+      </div>
+
+      <!-- 2. Customer type -->
+      <div class="form-section">
+        <h2 class="form-section-title">Customer type</h2>
+        <div class="field" id="field-customertype">
+          <label for="customertype">I'm registering as <span class="req" aria-hidden="true">*</span></label>
+          <select id="customertype" name="customertype" aria-describedby="customertype-msg">
+            <option value="">Select customer type</option>
+            <option value="Individual">Individual</option>
+            <option value="Professional">Professional</option>
+          </select>
+          <span class="field-msg" id="customertype-msg" role="status"></span>
+        </div>
+      </div>
+
+      <!-- 3. Delivery address -->
+      <div class="form-section">
+        <h2 class="form-section-title">Delivery address</h2>
+        <p class="field-hint" style="margin-bottom: 0.75rem;">So we can deliver your orders to the right place.</p>
+        <div class="field" id="field-country">
+          <label for="country">Country <span class="req" aria-hidden="true">*</span></label>
+          <select id="country" name="country" autocomplete="country" aria-describedby="country-msg">
+            <option value="">Select country</option>
+            <option value="NL">Netherlands</option>
+            <option value="ES">Spain</option>
+            <option value="BE">Belgium</option>
+          </select>
+          <span class="field-msg" id="country-msg" role="status"></span>
+        </div>
+        <div class="field" id="field-street">
+          <label for="street">Street address <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="street" name="street" autocomplete="street-address" placeholder="Street and number" aria-describedby="street-msg">
+          <span class="field-msg" id="street-msg" role="status"></span>
+        </div>
+        <div class="field" id="field-postcode">
+          <label for="postcode">Postcode</label>
+          <input type="text" id="postcode" name="postcode" autocomplete="postal-code" placeholder="e.g. 1012 AB" aria-describedby="postcode-msg">
+          <span class="field-msg" id="postcode-msg" role="status"></span>
+        </div>
+        <div class="field" id="field-city">
+          <label for="city">City <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="city" name="city" autocomplete="address-level2" placeholder="City or town" aria-describedby="city-msg">
+          <span class="field-msg" id="city-msg" role="status"></span>
+        </div>
+        <div class="field" id="field-region">
+          <label for="region">State / region</label>
+          <select id="region" name="region" aria-describedby="region-msg">
+            <option value="">Select if applicable</option>
+            <option value="NL-NH">Noord-Holland</option>
+            <option value="NL-ZH">Zuid-Holland</option>
+            <option value="ES-M">Madrid</option>
+            <option value="ES-B">Barcelona</option>
+          </select>
+          <span class="field-msg" id="region-msg" role="status"></span>
+        </div>
+      </div>
+
+      <!-- 4. Contact & identification -->
+      <div class="form-section">
+        <h2 class="form-section-title">Contact & identification</h2>
+        <div class="field" id="field-phone">
+          <label for="phone">Phone number <span class="req" aria-hidden="true">*</span></label>
+          <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="e.g. +31 6 12345678" aria-describedby="phone-msg">
+          <p class="field-hint">So we can reach you about your order if needed.</p>
+          <span class="field-msg" id="phone-msg" role="status"></span>
+        </div>
+
+        <div class="field" id="field-dni">
+          <label for="dni"><span id="dni-label-text">Tax ID or national ID number</span></label>
+          <input type="text" id="dni" name="dni" placeholder="e.g. 12345678A" aria-describedby="dni-msg dni-helper" autocomplete="off">
+          <p class="id-helper" id="dni-helper" role="status"></p>
+          <span class="field-msg" id="dni-msg" role="status"></span>
+        </div>
+      </div>
+
+      <!-- 5. Account details -->
+      <div class="form-section">
+        <h2 class="form-section-title">Account details</h2>
+        <div class="field" id="field-email">
+          <label for="email">Email address <span class="req" aria-hidden="true">*</span></label>
+          <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" aria-describedby="email-msg">
+          <p class="field-hint">We'll only use it for your account and order updates.</p>
+          <span class="field-msg" id="email-msg" role="status"></span>
+        </div>
+        <div class="field" id="field-password">
+          <label for="password">Password <span class="req" aria-hidden="true">*</span></label>
+          <div class="input-wrap">
+            <input type="password" id="password" name="password" autocomplete="new-password" placeholder="At least 6 characters" aria-describedby="password-msg password-strength" aria-invalid="false">
+            <button type="button" class="eye-btn" id="toggle-password" aria-label="Show or hide password"><span aria-hidden="true">👁</span></button>
+          </div>
+          <p class="field-hint">Longer and mixed characters make it stronger.</p>
+          <p class="password-strength" id="password-strength">Strength: —</p>
+          <div class="password-bars" id="password-bars" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <span class="field-msg" id="password-msg" role="status"></span>
+        </div>
+        <div class="field" id="field-password-confirm">
+          <label for="password-confirm">Confirm password <span class="req" aria-hidden="true">*</span></label>
+          <div class="input-wrap">
+            <input type="password" id="password-confirm" name="password_confirm" autocomplete="new-password" placeholder="Repeat your password" aria-describedby="password-confirm-msg">
+            <button type="button" class="eye-btn" id="toggle-password-confirm" aria-label="Show or hide"><span aria-hidden="true">👁</span></button>
+          </div>
+          <span class="field-msg" id="password-confirm-msg" role="status"></span>
+        </div>
+      </div>
+
+      <!-- 6. Agreement -->
+      <div class="form-section agreement-section">
+        <h2 class="form-section-title">Agreement</h2>
+        <div class="checkbox-field" id="field-terms">
+          <label for="terms">
+            <input type="checkbox" id="terms" name="terms" required aria-describedby="terms-msg">
+            <span>I have read and accept the <a href="#">Terms and Conditions</a>.</span>
+          </label>
+          <span class="field-msg" id="terms-msg" role="status"></span>
+        </div>
+        <div class="checkbox-field" id="field-privacy">
+          <label for="privacy">
+            <input type="checkbox" id="privacy" name="privacy" required aria-describedby="privacy-msg">
+            <span>I have read and accept the <a href="#">Privacy Policy</a>.</span>
+          </label>
+          <span class="field-msg" id="privacy-msg" role="status"></span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">Create account</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Legal rule: ID not required for individuals shipping outside Spain. Export = any shipment outside Spain (no separate type).
+    function isIDRequired() {
+      var country = document.getElementById('country').value;
+      var type = document.getElementById('customertype').value;
+      return country === 'ES' || type === 'Professional';
+    }
+
+    function updateIDUI() {
+      var required = isIDRequired();
+      var labelEl = document.getElementById('dni-label-text');
+      var inputEl = document.getElementById('dni');
+      var helperEl = document.getElementById('dni-helper');
+      if (!labelEl || !inputEl || !helperEl) return;
+
+      labelEl.innerHTML = 'Tax ID or national ID number' + (required ? ' <span class="req" aria-hidden="true">*</span>' : '');
+      inputEl.removeAttribute('required');
+      if (required) inputEl.setAttribute('required', 'required');
+
+      if (required) {
+        helperEl.textContent = 'We need this to issue your invoices and process your orders without delays. Thank you for helping us get it right.';
+        helperEl.className = 'id-helper';
+      } else {
+        helperEl.textContent = 'Optional for you. If you share it, we can speed up delivery and avoid hold-ups.';
+        helperEl.className = 'id-helper optional';
+      }
+
+      if (!required) {
+        var field = document.getElementById('field-dni');
+        var msg = document.getElementById('dni-msg');
+        field.classList.remove('is-valid', 'is-invalid');
+        msg.textContent = '';
+        msg.className = 'field-msg';
+        inputEl.setAttribute('aria-invalid', 'false');
+      }
+    }
+
+    document.getElementById('country').addEventListener('change', function() {
+      updateIDUI();
+      validateField('dni');
+    });
+    document.getElementById('customertype').addEventListener('change', function() {
+      updateIDUI();
+      validateField('dni');
+    });
+
+    function setupEye(btnId, inputId) {
+      var btn = document.getElementById(btnId);
+      var input = document.getElementById(inputId);
+      if (!btn || !input) return;
+      btn.addEventListener('click', function() {
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        btn.querySelector('span').textContent = show ? '🙈' : '👁';
+      });
+    }
+    setupEye('toggle-password', 'password');
+    setupEye('toggle-password-confirm', 'password-confirm');
+
+    var strengthEl = document.getElementById('password-strength');
+    var bars = document.querySelectorAll('#password-bars span');
+    document.getElementById('password').addEventListener('input', function() {
+      var v = this.value;
+      var s = 0;
+      if (v.length >= 6) s = 1;
+      if (v.length >= 8) s = 2;
+      if (/[0-9]/.test(v) && /[^a-zA-Z0-9]/.test(v)) s = 3;
+      if (v.length >= 10 && s === 3) s = 4;
+      var labels = ['—', 'Weak', 'Fair', 'Good', 'Strong'];
+      strengthEl.textContent = 'Strength: ' + labels[s];
+      strengthEl.className = 'password-strength' + (s > 0 ? ' ' + ['weak','fair','good','strong'][s-1] : '');
+      bars.forEach(function(bar, i) {
+        bar.classList.remove('filled', 'weak', 'fair', 'good', 'strong');
+        if (i < s) bar.classList.add('filled', ['weak','fair','good','strong'][s-1]);
+      });
+      if (typeof validateField === 'function') validateField('password_confirm');
+    });
+
+    var form = document.getElementById('signup-form');
+    var fields = {
+      firstname: { el: document.getElementById('firstname'), msg: document.getElementById('firstname-msg'), validate: function(v) { return v.trim().length >= 2; }, error: 'Please enter at least 2 characters.' },
+      lastname:  { el: document.getElementById('lastname'),  msg: document.getElementById('lastname-msg'),  validate: function(v) { return v.trim().length >= 2; }, error: 'Please enter at least 2 characters.' },
+      customertype: { el: document.getElementById('customertype'), msg: document.getElementById('customertype-msg'), validate: function(v) { return v.length > 0; }, error: 'Please select a customer type.' },
+      country:   { el: document.getElementById('country'),  msg: document.getElementById('country-msg'),  validate: function(v) { return v.length > 0; }, error: 'Please select your country.' },
+      street:    { el: document.getElementById('street'),   msg: document.getElementById('street-msg'),   validate: function(v) { return v.trim().length >= 3; }, error: 'Please enter a valid address.' },
+      city:      { el: document.getElementById('city'),     msg: document.getElementById('city-msg'),     validate: function(v) { return v.trim().length >= 2; }, error: 'Please enter your city or town.' },
+      phone:     { el: document.getElementById('phone'),   msg: document.getElementById('phone-msg'),   validate: function(v) { return v.trim().length >= 8; }, error: 'Please enter a valid phone number.' },
+      dni:       { el: document.getElementById('dni'),      msg: document.getElementById('dni-msg'),      validate: function(v) { return v.trim().length >= 5; }, error: 'Please enter a valid ID or tax number.' },
+      email:     { el: document.getElementById('email'),   msg: document.getElementById('email-msg'),   validate: function(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }, error: 'Please enter a valid email address.' },
+      password:  { el: document.getElementById('password'), msg: document.getElementById('password-msg'), validate: function(v) { return v.length >= 6; }, error: 'At least 6 characters required.' },
+      password_confirm: { el: document.getElementById('password-confirm'), msg: document.getElementById('password-confirm-msg'), validate: function(v) { return v === document.getElementById('password').value && document.getElementById('password').value.length >= 6; }, error: 'Passwords do not match.' },
+      terms:    { el: document.getElementById('terms'),     msg: document.getElementById('terms-msg'),   validate: function() { return document.getElementById('terms').checked; }, error: 'Please accept the Terms and Conditions.' },
+      privacy:   { el: document.getElementById('privacy'),  msg: document.getElementById('privacy-msg'), validate: function() { return document.getElementById('privacy').checked; }, error: 'Please accept the Privacy Policy.' }
+    };
+
+    function setState(name, state, text) {
+      var field = document.getElementById('field-' + name);
+      var f = fields[name];
+      if (!field || !f) return;
+      field.classList.remove('is-valid', 'is-invalid');
+      f.msg.textContent = '';
+      f.msg.className = 'field-msg';
+      if (state === 'valid') {
+        field.classList.add('is-valid');
+        f.msg.className = 'field-msg success';
+        f.msg.textContent = '✓';
+      } else if (state === 'invalid') {
+        field.classList.add('is-invalid');
+        f.msg.className = 'field-msg error';
+        f.msg.textContent = text || f.error;
+      }
+      if (f.el && f.el.setAttribute) f.el.setAttribute('aria-invalid', state === 'invalid' ? 'true' : 'false');
+    }
+
+    function validateField(name) {
+      var f = fields[name];
+      if (!f || !f.el) return;
+      if (name === 'dni' && !isIDRequired()) {
+        setState(name, null);
+        return;
+      }
+      var v = (name === 'terms' || name === 'privacy') ? '' : f.el.value;
+      if (f.validate(v)) setState(name, 'valid');
+      else setState(name, 'invalid');
+    }
+
+    Object.keys(fields).forEach(function(name) {
+      var f = fields[name];
+      if (!f || !f.el) return;
+      if (name === 'terms' || name === 'privacy') {
+        f.el.addEventListener('change', function() { validateField(name); });
+        return;
+      }
+      f.el.addEventListener('blur', function() { validateField(name); });
+      f.el.addEventListener('input', function() {
+        var fieldEl = document.getElementById('field-' + name);
+        if (fieldEl && fieldEl.classList.contains('is-invalid')) validateField(name);
+      });
+    });
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      updateIDUI();
+      var valid = true;
+      Object.keys(fields).forEach(function(name) {
+        validateField(name);
+        if (document.getElementById('field-' + name) && document.getElementById('field-' + name).classList.contains('is-invalid')) valid = false;
+      });
+      if (valid) alert('Mockup: form is valid.');
+    });
+
+    updateIDUI();
+  </script>
+</body>
+</html>
